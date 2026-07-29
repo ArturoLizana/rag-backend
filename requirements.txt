@@ -1,18 +1,14 @@
-fastapi                           # TON SERVEUR APPARATÎT ICI !
-uvicorn                           # Le moteur pour exécuter FastAPI
-python-dotenv                     # Pour lire ton fichier .env
+fastapi
+uvicorn
+python-dotenv
 groq
-pydantic                          # Pour valider les données de tes API
-python-multipart                  # Pour permettre le téléversement de fichiers (PDF)
-
-# LangChain & IA
-langchain                         # Le framework IA principal
+pydantic
+python-multipart
+langchain
 langchain-community
 langchain-core
-langchain-groq                    # Pour connecter Groq (Llama 3)
-langchain-text-splitters          # Pour le découpage (chunking)
-
-# Vector Store & Embeddings
-faiss-cpu                         # La base de données vectorielle
-sentence-transformers             # Pour créer les embeddings
-pypdf                             # Pour lire les fichiers PDF
+langchain-groq
+langchain-text-splitters
+faiss-cpu
+sentence-transformers
+pypdf
