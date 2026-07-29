@@ -1,0 +1,17 @@
+fastapi==0.111.0            # TON SERVEUR APPARATÎT ICI !
+uvicorn[standard]==0.30.1   # Le moteur pour exécuter FastAPI
+python-dotenv==1.0.1       # Pour lire ton fichier .env
+pydantic==2.7.4             # Pour valider les données de tes API
+python-multipart==0.0.9     # Pour permettre le téléversement de fichiers (PDF)
+
+# LangChain & IA
+langchain==0.2.6            # Le framework IA principal
+langchain-community==0.2.6
+langchain-core==0.2.10
+langchain-groq==0.1.6       # Pour connecter Groq (Llama 3)
+langchain-text-splitters==0.2.2 # Pour le découpage (chunking)
+
+# Vector Store & Embeddings
+faiss-cpu>=1.8.0             # La base de données vectorielle
+sentence-transformers==3.0.1 # Pour créer les embeddings
+pypdf==4.2.0                # Pour lire les fichiers PDF
