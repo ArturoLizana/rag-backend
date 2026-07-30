@@ -14,16 +14,25 @@ FAISS_INDEX_PATH = "faiss_index"
 
 class RAGService:
     def __init__(self):
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name=settings.EMBEDDING_MODEL
-        )
+        self._embeddings = None
         self.vector_store: FAISS = None
-        # Chargement automatique d'un index déjà existant s'il y en a un
-        self.load_existing_index()
+
+    @property
+    def embeddings(self):
+        """Chargement du modèle uniquement quand une requête le demande."""
+        if self._embeddings is None:
+            print("⏳ Chargement du modèle d'embeddings HuggingFace...")
+            self._embeddings = HuggingFaceEmbeddings(
+                model_name=settings.EMBEDDING_MODEL,
+                model_kwargs={'device': 'cpu'},
+                encode_kwargs={'normalize_embeddings': True}
+            )
+            print("✅ Modèle d'embeddings prêt !")
+        return self._embeddings
 
     def load_existing_index(self):
         """Recharge l'index FAISS sauvegardé sur le disque si présent."""
-        if os.path.exists(FAISS_INDEX_PATH):
+        if self.vector_store is None and os.path.exists(FAISS_INDEX_PATH):
             try:
                 self.vector_store = FAISS.load_local(
                     FAISS_INDEX_PATH, 
@@ -62,6 +71,10 @@ class RAGService:
         return len(chunks)
 
     def answer_question(self, question: str) -> Dict[str, Any]:
+        # Charger l'index existant si pas encore fait en mémoire
+        if self.vector_store is None:
+            self.load_existing_index()
+
         if not self.vector_store:
             return {
                 "answer": "Veuillez d'abord télécharger un document PDF.",
