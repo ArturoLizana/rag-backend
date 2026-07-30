@@ -1,4 +1,5 @@
 import os
+import gc
 from typing import Dict, Any
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -67,6 +68,9 @@ class RAGService:
         self.vector_store = FAISS.from_documents(chunks, self.embeddings)
         self.vector_store.save_local(FAISS_INDEX_PATH)
         print(f"💾 Index FAISS sauvegardé dans {FAISS_INDEX_PATH}")
+
+        # Nettoyage forcé de la mémoire RAM
+        gc.collect()
         
         return len(chunks)
 
