@@ -52,7 +52,7 @@ class RAGService:
 
         return ChatGroq(
             groq_api_key=api_key,
-            model_name="llama-3.3-70b-versatile",
+            model_name="llama-3.1-8b-instant",
             temperature=0.2
         )
 
