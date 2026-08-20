@@ -45,12 +45,14 @@ class RAGService:
                 print(f" Impossible de charger l'index existant : {e}")
 
     def _get_llm(self):
-        api_key = settings.GROQ_API_KEY
+        api_key = getattr(settings, "GROQ_API_KEY", None) or os.getenv("GROQ_API_KEY")
         if not api_key or api_key == "gsk_ta_cle_groq_ici":
-            raise ValueError("Veuillez configurer GROQ_API_KEY dans le fichier .env !")
+            raise ValueError("Veuillez configurer GROQ_API_KEY dans les variables Render !")
+        
+        # On force directement le modèle valide de Groq
         return ChatGroq(
             groq_api_key=api_key,
-            model_name=settings.LLM_MODEL,
+            model_name="llama-3.3-70b-versatile",
             temperature=0.2
         )
 
