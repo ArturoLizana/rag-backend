@@ -26,10 +26,14 @@ async def upload_pdf(file: UploadFile = File(...)):
             message="Document indexé avec succès."
         )
     except Exception as e:
+        print(f"❌ Erreur Upload : {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat_with_pdf(request: ChatRequest):
+def chat_with_pdf(request: ChatRequest):
     try:
         res = rag_service.answer_question(request.question)
         return ChatResponse(
@@ -37,4 +41,5 @@ async def chat_with_pdf(request: ChatRequest):
             sources=res["sources"]
         )
     except Exception as e:
+        print(f"❌ Erreur Chat : {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

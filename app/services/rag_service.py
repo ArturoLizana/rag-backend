@@ -20,7 +20,7 @@ class RAGService:
 
     @property
     def embeddings(self):
-        """Chargement du modèle uniquement quand une requête le demande."""
+ 
         if self._embeddings is None:
             print("⏳ Chargement du modèle d'embeddings HuggingFace...")
             self._embeddings = HuggingFaceEmbeddings(
@@ -32,24 +32,24 @@ class RAGService:
         return self._embeddings
 
     def load_existing_index(self):
-        """Recharge l'index FAISS sauvegardé sur le disque si présent."""
+ 
         if self.vector_store is None and os.path.exists(FAISS_INDEX_PATH):
             try:
                 self.vector_store = FAISS.load_local(
                     FAISS_INDEX_PATH, 
                     self.embeddings,
-                    allow_dangerous_deserialization=True  # Nécessaire pour FAISS local
+                    allow_dangerous_deserialization=True
                 )
-                print(" Index FAISS existant rechargé avec succès !")
+                print("✅ Index FAISS existant rechargé avec succès !")
             except Exception as e:
-                print(f" Impossible de charger l'index existant : {e}")
+                print(f"❌ Impossible de charger l'index existant : {e}")
 
     def _get_llm(self):
-        api_key = getattr(settings, "GROQ_API_KEY", None) or os.getenv("GROQ_API_KEY")
+        api_key = settings.GROQ_API_KEY or os.getenv("GROQ_API_KEY")
         if not api_key or api_key == "gsk_ta_cle_groq_ici":
             raise ValueError("Veuillez configurer GROQ_API_KEY dans les variables Render !")
         
-        # On force directement le modèle valide de Groq
+
         return ChatGroq(
             groq_api_key=api_key,
             model_name="llama-3.3-70b-versatile",
@@ -66,18 +66,18 @@ class RAGService:
         )
         chunks = text_splitter.split_documents(documents)
         
-        # Génération et sauvegarde locale de FAISS
+   
         self.vector_store = FAISS.from_documents(chunks, self.embeddings)
         self.vector_store.save_local(FAISS_INDEX_PATH)
         print(f"💾 Index FAISS sauvegardé dans {FAISS_INDEX_PATH}")
 
-        # Nettoyage forcé de la mémoire RAM
+ 
         gc.collect()
-        
+
         return len(chunks)
 
     def answer_question(self, question: str) -> Dict[str, Any]:
-        # Charger l'index existant si pas encore fait en mémoire
+
         if self.vector_store is None:
             self.load_existing_index()
 
@@ -93,7 +93,7 @@ class RAGService:
         
         context = "\n\n".join([doc.page_content for doc in docs])
 
-        # Extraction des sources (page + extrait)
+
         sources = []
         for doc in docs:
             page_num = doc.metadata.get("page", 0) + 1

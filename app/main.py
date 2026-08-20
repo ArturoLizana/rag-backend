@@ -1,4 +1,5 @@
 import os
+
 # Brider la mémoire et le multi-threading de PyTorch au démarrage
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
@@ -26,10 +27,12 @@ app.add_middleware(
 class QueryRequest(BaseModel):
     question: str
 
+# Route GET : Permet de vérifier que le serveur tourne bien
 @app.get("/")
 def read_root():
     return {"status": "online", "message": "API RAG fonctionnelle"}
 
+# Route POST : Pour l'envoi du document PDF
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
@@ -48,11 +51,15 @@ async def upload_pdf(file: UploadFile = File(...)):
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
+# Route POST : Pour poser des questions dans le Chat
 @app.post("/chat")
 def chat(request: QueryRequest):
-    result = rag_service.answer_question(request.question)
-    # On renvoie la réponse ET les sources au frontend !
-    return {
-        "answer": result["answer"],
-        "sources": result["sources"]
-    }
+    try:
+        result = rag_service.answer_question(request.question)
+        return {
+            "answer": result["answer"],
+            "sources": result["sources"]
+        }
+    except Exception as e:
+        print(f"Erreur interne lors du chat: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
